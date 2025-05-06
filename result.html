@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Attendance Result</title>
+  <link rel="stylesheet" href="result.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <img id="img1" src="Screenshot 2025-05-06 120003.png" alt="Background Image">
+  <div class="result-box" id="resultContent">
+    <h1>Attendance Result</h1>
+    <div class="piebox">
+      <canvas id="attendanceChart"></canvas>
+      <p id="resultText">Loading...</p>
+    </div>
+    
+    <button class="back-button" onclick="goBack()">Back</button>
+  </div>
+
+  <script>
+    const present = parseInt(localStorage.getItem("present") || 0);
+    const total = parseInt(localStorage.getItem("total") || 0);
+    const result = localStorage.getItem("attendanceResult") || "No data found.";
+    const absent = total - present;
+
+    document.getElementById("resultText").textContent = result;
+
+    if (total > 0) {
+      const ctx = document.getElementById('attendanceChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Present', 'Absent'],
+          datasets: [{
+            data: [present, absent],
+            backgroundColor: ['#4CAF50', '#f44336']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            title: {
+              display: true,
+              text: 'Attendance Breakdown'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(tooltipItem) {
+                  const total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
+                  const value = tooltipItem.raw;
+                  const percentage = Math.floor((value / total) * 100);
+                  return `${tooltipItem.label}: ${percentage}%`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function goBack() {
+      window.location.href = "attendance.html";
+    }
+  </script>
+</body>
+</html>
