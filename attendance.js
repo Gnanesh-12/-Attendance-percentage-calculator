@@ -1,12 +1,18 @@
-document.getElementById("attendanceform").addEventListener("submit", function(event) {
+document.getElementById("attendanceform").addEventListener("submit", function (event) {
     event.preventDefault();
 
-    const requiredPercentage = parseFloat(document.getElementById("percentage").value);
+    const percentageSelect = document.getElementById("percentage");
+    if (percentageSelect.value === "default") {
+        alert("Please select a target percentage.");
+        return;
+    }
+
+    const requiredPercentage = parseFloat(percentageSelect.value);
     const present = parseInt(document.getElementById("present").value);
     const total = parseInt(document.getElementById("total").value);
 
     if (isNaN(present) || isNaN(total) || present < 0 || total <= 0 || present > total) {
-        alert("Please enter valid numbers. 'Present' should be ≤ 'Total'.");
+        alert("Please enter valid numbers. 'Days Present' should be less than or equal to 'Total Classes'.");
         return;
     }
 
@@ -27,8 +33,8 @@ document.getElementById("attendanceform").addEventListener("submit", function(ev
         futuretotal--;
 
         message = `You can bunk for ${maxbunk} more days. \n` +
-                  `Current Attendance: ${present}/${total} -> ${currentPercentage.toFixed(2)}% \n` +
-                  `Attendance then: ${futurepresent}/${futuretotal} -> ${((futurepresent / futuretotal) * 100).toFixed(2)}%`;
+            `Current Attendance: ${present}/${total} -> ${currentPercentage.toFixed(2)}% \n` +
+            `Attendance then: ${futurepresent}/${futuretotal} -> ${((futurepresent / futuretotal) * 100).toFixed(2)}%`;
     } else {
         let needed = 0;
         let futureTotal = total;
@@ -41,8 +47,8 @@ document.getElementById("attendanceform").addEventListener("submit", function(ev
         }
 
         message = `You need to attend ${needed} more days. \n` +
-                  `Current Attendance: ${present}/${total} -> ${currentPercentage.toFixed(2)}% \n` +
-                  `Attendance then: ${futurePresent}/${futureTotal} -> ${((futurePresent / futureTotal) * 100).toFixed(2)}%`;
+            `Current Attendance: ${present}/${total} -> ${currentPercentage.toFixed(2)}% \n` +
+            `Attendance then: ${futurePresent}/${futureTotal} -> ${((futurePresent / futureTotal) * 100).toFixed(2)}%`;
     }
 
     localStorage.setItem("attendanceResult", message);
