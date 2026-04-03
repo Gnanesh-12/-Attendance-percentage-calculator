@@ -1,70 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Attendance Result</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="result.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
+  <div class="bg-glow"></div>
   <img id="img1" src="Screenshot 2025-05-06 120003.png" alt="Background Image">
-  <div class="result-box" id="resultContent">
-    <h1>Attendance Result</h1>
-    <div class="piebox">
-      <canvas id="attendanceChart"></canvas>
-      <p id="resultText">Loading...</p>
+
+  <main class="main-wrapper">
+    <div class="result-box animate-up" id="resultContent">
+      <header>
+        <h1>Attendance <span class="accent">Result</span></h1>
+      </header>
+
+      <div class="pie-container">
+        <canvas id="attendanceChart"></canvas>
+      </div>
+
+      <div class="message-card">
+        <p id="resultText">Calculating...</p>
+      </div>
+
+      <button class="back-button" onclick="goBack()">
+        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back to Calculator</span>
+      </button>
     </div>
-    
-    <button class="back-button" onclick="goBack()">Back</button>
-  </div>
+  </main>
 
   <script>
     const present = parseInt(localStorage.getItem("present") || 0);
     const total = parseInt(localStorage.getItem("total") || 0);
-    const result = localStorage.getItem("attendanceResult") || "No data found.";
+    let result = localStorage.getItem("attendanceResult") || "No data found.";
     const absent = total - present;
 
-    document.getElementById("resultText").textContent = result;
+    // Format the multi-line message from localStorage
+    const resultElement = document.getElementById("resultText");
+    resultElement.innerHTML = result.replace(/\n/g, '<br>');
 
     if (total > 0) {
       const ctx = document.getElementById('attendanceChart').getContext('2d');
+
+      // Modern Chart.js configuration
       new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
           labels: ['Present', 'Absent'],
           datasets: [{
             data: [present, absent],
-            backgroundColor: ['#4CAF50', '#f44336']
+            backgroundColor: ['#8b5cf6', '#1e293b'],
+            borderColor: ['#c084fc', 'rgba(255, 255, 255, 0.1)'],
+            borderWidth: 2,
+            hoverOffset: 15,
+            spacing: 5
           }]
         },
         options: {
           responsive: true,
+          cutout: '75%',
           plugins: {
             legend: {
-              position: 'bottom'
-            },
-            title: {
-              display: true,
-              text: 'Attendance Breakdown'
+              position: 'bottom',
+              labels: {
+                color: '#94a3b8',
+                font: {
+                  family: "'Outfit', sans-serif",
+                  size: 14
+                },
+                padding: 20,
+                usePointStyle: true
+              }
             },
             tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.9)',
+              titleFont: { family: "'Outfit', sans-serif" },
+              bodyFont: { family: "'Outfit', sans-serif" },
+              padding: 12,
+              cornerRadius: 8,
+              displayColors: false,
               callbacks: {
-                label: function(tooltipItem) {
-                  const total = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
+                label: function (tooltipItem) {
+                  const totalVal = tooltipItem.dataset.data.reduce((a, b) => a + b, 0);
                   const value = tooltipItem.raw;
-                  const percentage = Math.floor((value / total) * 100);
-                  return `${tooltipItem.label}: ${percentage}%`;
+                  const percentage = Math.round((value / totalVal) * 100);
+                  return ` ${tooltipItem.label}: ${value} classes (${percentage}%)`;
                 }
               }
             }
+          },
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 2000,
+            easing: 'easeOutQuart'
           }
         }
       });
     }
 
     function goBack() {
-      window.location.href = "attendance.html";
+      window.location.href = "index.html";
     }
   </script>
 </body>
+
 </html>
